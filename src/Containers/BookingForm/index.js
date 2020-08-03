@@ -1,14 +1,20 @@
 import React, { Component } from "react";
 import moment from "moment";
 import { Form, Row, Icon, Button, Tooltip, DatePicker } from "antd";
-import FlightTypeSelector from "../../components/FlightTypeSelector";
-import { ROUND_TRIP } from "../../components/FlightTypeSelector/constants";
+import DropdownSelect from "../../components/DropdownSelect";
 import PassengersSelector from "../../components/PassengersSelector";
 import { PASSENGERS_INITIAL_VALUE } from "../../components/PassengersSelector/constants";
-import TravelClassSelector from "../../components/TravelClassSelector";
-import { ECONOMY } from "../../components/TravelClassSelector/constants";
 import AirfieldSearcher from "../../components/AirfieldSearcher";
 import { generatePassengerSelectorLabel } from "../../components/PassengersSelector/utils";
+import {
+  TOOLTIP_DELAY,
+  ORIGIN_SELECTED_DATA,
+  DESTINATION_SELECTED_DATA,
+  ROUND_TRIP,
+  FLIGHT_TYPES,
+  ECONOMY,
+  TRAVEL_CLASES,
+} from "./constants";
 
 const { RangePicker } = DatePicker;
 
@@ -17,8 +23,16 @@ function hasErrors(fieldsError) {
 }
 
 class BookingForm extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      [ORIGIN_SELECTED_DATA]: {},
+      [DESTINATION_SELECTED_DATA]: {},
+    };
+  }
+
+  // Can only select days after today (included) and same day as today but next year (excluded)
   getDisabledTime = current => {
-    // Can not select days before today and today
     return (
       current &&
       (current < moment().subtract(1, "d") ||
@@ -28,6 +42,32 @@ class BookingForm extends Component {
             .subtract(1, "d"))
     );
   };
+
+  setSelectedData = (field, { apicode, ...data }) => {
+    this.setState({
+      [field]: { ...this.state[field], [apicode]: data },
+    });
+  };
+
+  setOriginSelectedData = data =>
+    this.setSelectedData(ORIGIN_SELECTED_DATA, data);
+
+  setDestinationSelectedData = data =>
+    this.setSelectedData(DESTINATION_SELECTED_DATA, data);
+
+  clearSelectedData = (field, apicode) => {
+    const newState = this.state[field];
+    delete newState[apicode];
+    this.setState({
+      [field]: newState,
+    });
+  };
+
+  clearOriginSelectedData = apicode =>
+    this.clearSelectedData(ORIGIN_SELECTED_DATA, apicode);
+
+  clearDestinationSelectedData = apicode =>
+    this.clearSelectedData(DESTINATION_SELECTED_DATA, apicode);
 
   handleSubmit = e => {
     console.log("DOING SUBMIT");
@@ -40,37 +80,41 @@ class BookingForm extends Component {
   };
 
   handleSwapAirfields = () => {
-    const { form } = this.props;
-    const originValue = form.getFieldValue("Origin");
-    const destinationValue = form.getFieldValue("Destination");
-
-    console.log("handleSwapAirfields", originValue, destinationValue);
-    form.setFieldsValue({ Origin: destinationValue, Destination: originValue });
+    const {
+      form: { getFieldValue, resetFields, setFieldsValue },
+    } = this.props;
+    const origin = getFieldValue("origin");
+    const destination = getFieldValue("destination");
+    resetFields(["origin", "destination"]);
+    setTimeout(() => {
+      setFieldsValue({ origin: destination, destination: origin });
+      this.setState({
+        [ORIGIN_SELECTED_DATA]: this.state[DESTINATION_SELECTED_DATA],
+        [DESTINATION_SELECTED_DATA]: this.state[ORIGIN_SELECTED_DATA],
+      });
+    }, 300);
   };
 
   render() {
     const {
-      form: {
-        getFieldDecorator,
-        getFieldValue,
-        getFieldsValue,
-        getFieldsError,
-      },
+      form: { getFieldDecorator, getFieldValue, getFieldsValue },
     } = this.props;
+    const { passengers, origin, destination, date } = getFieldsValue([
+      "passengers",
+      "origin",
+      "destination",
+      "date",
+    ]);
 
-    console.log("fields", getFieldsValue());
-    const {
-      origin: originErrors,
-      destination: destinationErrors,
-      date: dateErrors,
-    } = getFieldsError(["origin", "destination", "date"]);
+    const travelersAmount = generatePassengerSelectorLabel(passengers).amount;
 
-    const passengersValue = getFieldValue("passengers");
-    const travelersAmount = generatePassengerSelectorLabel(passengersValue)
-      .amount;
-
+    const shouldDisableSwapButton =
+      !origin ||
+      origin.length === 0 ||
+      !destination ||
+      destination.length === 0;
     const shouldDisableSearchButton =
-      travelersAmount === 0 || originErrors || destinationErrors || dateErrors;
+      travelersAmount === 0 || !passengers || !date || shouldDisableSwapButton;
 
     return (
       <Form
@@ -88,7 +132,7 @@ class BookingForm extends Component {
                 { required: true, message: "Please select a flight type!" },
               ],
               initialValue: ROUND_TRIP,
-            })(<FlightTypeSelector />)}
+            })(<DropdownSelect title="Flight type" options={FLIGHT_TYPES} />)}
           </Form.Item>
           <Form.Item>
             {getFieldDecorator("passengers", {
@@ -107,22 +151,32 @@ class BookingForm extends Component {
                 { required: true, message: "Please select a travel class!" },
               ],
               initialValue: ECONOMY,
-            })(<TravelClassSelector />)}
+            })(<DropdownSelect title="Travel class" options={TRAVEL_CLASES} />)}
           </Form.Item>
         </Row>
         <Row type="flex" justify="start" style={{}}>
           <Form.Item>
             {getFieldDecorator("origin", {
               rules: [{ required: true, message: "Please select an origin!" }],
-            })(<AirfieldSearcher placeholder="From?" />)}
+              initialValue: [],
+            })(
+              <AirfieldSearcher
+                placeholder="From?"
+                selectedData={this.state[ORIGIN_SELECTED_DATA]}
+                setSelectedData={this.setOriginSelectedData}
+                clearSelectedData={this.clearOriginSelectedData}
+              />
+            )}
           </Form.Item>
-          <Tooltip title="Swap origin and destination" mouseEnterDelay={1}>
+          <Tooltip
+            title="Swap origin and destination"
+            mouseEnterDelay={TOOLTIP_DELAY}
+          >
             <Button
-              type="link"
-              disabled={false}
+              disabled={shouldDisableSwapButton}
               icon="swap"
               onClick={this.handleSwapAirfields}
-              style={{ marginRight: "16px" }}
+              style={{ margin: "4px 16px 0 0" }}
             />
           </Tooltip>
           <Form.Item>
@@ -130,7 +184,15 @@ class BookingForm extends Component {
               rules: [
                 { required: true, message: "Please select a destination!" },
               ],
-            })(<AirfieldSearcher placeholder="Where?" />)}
+              initialValue: [],
+            })(
+              <AirfieldSearcher
+                placeholder="Where?"
+                selectedData={this.state[DESTINATION_SELECTED_DATA]}
+                setSelectedData={this.setDestinationSelectedData}
+                clearSelectedData={this.clearDestinationSelectedData}
+              />
+            )}
           </Form.Item>
           <Form.Item>
             {getFieldDecorator("date", {

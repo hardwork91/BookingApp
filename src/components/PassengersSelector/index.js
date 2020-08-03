@@ -3,6 +3,7 @@ import { Icon, Menu, Dropdown, Tooltip } from "antd";
 import AmountSelector from "./AmountSelector";
 import { generatePassengerSelectorLabel } from "./utils";
 import { PASSENGERS_CATEGORIES } from "./constants";
+import { TOOLTIP_DELAY } from "../../Containers/BookingForm/constants";
 
 export default class PassengersSelector extends Component {
   constructor(props) {
@@ -47,7 +48,7 @@ export default class PassengersSelector extends Component {
     const { label } = generatePassengerSelectorLabel(this.state.passengers);
 
     return (
-      <Tooltip title="Passengers" mouseEnterDelay={1}>
+      <Tooltip title="Passengers" mouseEnterDelay={TOOLTIP_DELAY}>
         <Dropdown
           overlay={this.renderMenu()}
           trigger={["click"]}

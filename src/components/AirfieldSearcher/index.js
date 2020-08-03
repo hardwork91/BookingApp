@@ -1,8 +1,12 @@
 import React, { Component } from "react";
-import axios from "axios";
-import { Select, Icon, Tooltip } from "antd";
+import { Select, Icon, Tooltip, Divider, Typography } from "antd";
+import airfields from "../../lib/api/airfields";
+import { MAX_AIRPORT_ALLOWED } from "./constants";
+import { mergeData } from "./utils";
+import { TOOLTIP_DELAY } from "../../Containers/BookingForm/constants";
 
 const { Option } = Select;
+const { Text } = Typography;
 
 let timeout;
 let currentValue;
@@ -15,56 +19,24 @@ function fetch(value, callback) {
   currentValue = value;
 
   function fake() {
-    console.log("value", value);
-    axios
-      .get(
-        `https://www.kayak.com/mv/marvel?f=j&where=${value}&s=13&lc_cc=SP&lc=en&v=v1&cv=5`
-      )
-      .then(result => {
-        console.log(result);
-        if (currentValue === value) {
-          const data = [];
-          const mockedData = [
-            { apicode: 1, displayname: "A" },
-            { apicode: 2, displayname: "B" },
-            { apicode: 3, displayname: "C" },
-          ];
-          mockedData.forEach(({ apicode, displayname }) => {
-            // result.data.forEach(({ apicode, displayname }) => {
-            data.push({
-              value: apicode,
-              text: displayname,
-            });
-          });
-          callback(data);
-        }
-      });
-    // const str = querystring.encode({
-    //   code: "utf-8",
-    //   q: value,
-    // });
-    // jsonp(`https://suggest.taobao.com/sug?${str}`)
-    //   .then(response => response.json())
-    //   .then(d => {
-    //     if (currentValue === value) {
-    //       const { result } = d;
-    //       const data = [];
-    //       result.forEach(r => {
-    //         data.push({
-    //           value: r[0],
-    //           text: r[0],
-    //         });
-    //       });
-    //       callback(data);
-    //     }
-    //   });
-
-    // remove after
-    callback([
-      { value: 1, text: "A" },
-      { value: 2, text: "B" },
-      { value: 3, text: "C" },
-    ]);
+    airfields.search(value).then(result => {
+      if (currentValue === value) {
+        const data = [];
+        result.data &&
+          result.data.length &&
+          result.data.forEach(
+            ({ ap, apicode, shortdisplayname, displayname }) => {
+              data.push({
+                ap,
+                apicode,
+                shortdisplayname,
+                displayname,
+              });
+            }
+          );
+        callback(data);
+      }
+    });
   }
 
   timeout = setTimeout(fake, 300);
@@ -75,7 +47,6 @@ export default class AirfieldSearcher extends React.Component {
     super(props);
     this.state = {
       data: [],
-      value: props.value,
       noMatchingAirfield: false,
     };
   }
@@ -88,35 +59,77 @@ export default class AirfieldSearcher extends React.Component {
     }
   };
 
-  handleChange = value => {
-    this.setState(
-      { value },
-      this.props.onChange([{ value: 1, text: "aaaaaaaaa" }])
-    );
+  hanldeSelect = option => {
+    const { setSelectedData } = this.props;
+    const element = this.state.data.find(({ apicode }) => apicode === option);
+    this.setState({ data: [] }, setSelectedData(element));
+  };
+
+  hanldeDeselect = option => {
+    const { clearSelectedData } = this.props;
+    this.setState({ data: [] }, clearSelectedData(option));
+  };
+
+  handleChange = selectedOptions => {
+    this.props.onChange(selectedOptions);
   };
 
   render() {
-    const { value: initialValue } = this.props;
-    const { data, value, noMatchingAirfield } = this.state;
+    const { value, placeholder, selectedData } = this.props;
+    const { data, noMatchingAirfield } = this.state;
 
-    const options = data.map(d => <Option key={d.value}>{d.text}</Option>);
+    const valueLength = value.length;
+
+    const options = mergeData(selectedData, data).map(
+      ({ ap, apicode, shortdisplayname, displayname }) => {
+        return (
+          <Option
+            key={apicode}
+            value={apicode}
+            shortdisplayname={shortdisplayname}
+            ap={ap}
+            disabled={
+              valueLength === MAX_AIRPORT_ALLOWED && !value.includes(apicode)
+            }
+          >
+            {displayname}
+          </Option>
+        );
+      }
+    );
 
     return (
-      <Tooltip title="Search for an airfield" mouseEnterDelay={1}>
+      <Tooltip title="Search for an airfield" mouseEnterDelay={TOOLTIP_DELAY}>
         <Select
           style={{ minWidth: "250px" }}
           showSearch
           value={value}
           mode="multiple"
-          placeholder={this.props.placeholder}
+          placeholder={placeholder}
           defaultActiveFirstOption={false}
           showArrow={false}
           filterOption={false}
           onSearch={this.handleSearch}
           onChange={this.handleChange}
+          onSelect={this.hanldeSelect}
+          onDeselect={this.hanldeDeselect}
           notFoundContent={
             noMatchingAirfield ? "Please enter a valid airfild name!" : null
           }
+          optionLabelProp={valueLength > 1 ? "ap" : "shortdisplayname"}
+          dropdownRender={menu => (
+            <div>
+              {menu}
+              {valueLength === MAX_AIRPORT_ALLOWED && (
+                <div style={{ marginBottom: "5px" }}>
+                  <Divider style={{ margin: "5px 0" }} />
+                  <Text strong style={{ marginLeft: "10px" }}>
+                    {`Maximun ${MAX_AIRPORT_ALLOWED} airports`}
+                  </Text>
+                </div>
+              )}
+            </div>
+          )}
         >
           {options}
         </Select>

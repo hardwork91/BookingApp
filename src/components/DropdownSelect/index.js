@@ -1,33 +1,34 @@
 import React, { Component } from "react";
 import { Icon, Menu, Dropdown, Tooltip } from "antd";
 import { TRAVEL_CLASES } from "./constants";
+import { TOOLTIP_DELAY } from "../../Containers/BookingForm/constants";
 
-export default class TravelClassSelector extends Component {
+export default class DropdownSelect extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedType: props.value,
+      value: props.value,
     };
   }
 
   handleSelect = ({ key }) => {
-    this.setState({ selectedType: key }, this.props.onChange(key));
+    this.setState({ value: key }, this.props.onChange(key));
   };
 
   renderMenu = () => (
-    <Menu selectedKeys={this.state.selectedType} onClick={this.handleSelect}>
-      {TRAVEL_CLASES.map(travelClass => (
-        <Menu.Item key={travelClass}>{travelClass}</Menu.Item>
+    <Menu selectedKeys={this.state.value} onClick={this.handleSelect}>
+      {this.props.options.map(option => (
+        <Menu.Item key={option}>{option}</Menu.Item>
       ))}
     </Menu>
   );
 
   render() {
     return (
-      <Tooltip title="Travel class" mouseEnterDelay={1}>
+      <Tooltip title={this.props.title} mouseEnterDelay={TOOLTIP_DELAY}>
         <Dropdown overlay={this.renderMenu()} trigger={["click"]}>
           <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-            {this.state.selectedType} <Icon type="down" />
+            {this.state.value} <Icon type="down" />
           </a>
         </Dropdown>
       </Tooltip>

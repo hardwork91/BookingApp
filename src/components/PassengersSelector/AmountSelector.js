@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 import { InputNumber, Typography } from "antd";
 import * as constants from "./constants";
 
@@ -13,7 +13,7 @@ export default class AmountSelector extends Component {
   render() {
     const { category, amount, onChange } = this.props;
     return (
-      <Fragment style={{ float: "right" }}>
+      <div >
         <Text style={{ marginRight: ".5em" }}>{category}</Text>
         <Text type="secondary">
           {constants[`${category.toUpperCase()}_DESCRIPTION`]}
@@ -26,7 +26,7 @@ export default class AmountSelector extends Component {
           onChange={this.handleChange}
           precision={0}
         />
-      </Fragment>
+      </div>
     );
   }
 }
