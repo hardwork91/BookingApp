@@ -1,11 +1,15 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
 import moment from "moment";
-import { Form, Row, Icon, Button, Tooltip, DatePicker } from "antd";
+import { Form, Row, Button, Tooltip, DatePicker } from "antd";
 import DropdownSelect from "../../components/DropdownSelect";
 import PassengersSelector from "../../components/PassengersSelector";
 import { PASSENGERS_INITIAL_VALUE } from "../../components/PassengersSelector/constants";
 import AirfieldSearcher from "../../components/AirfieldSearcher";
 import { generatePassengerSelectorLabel } from "../../components/PassengersSelector/utils";
+import Results from "../../components/Results";
+import { search, clear } from "./actions";
 import {
   TOOLTIP_DELAY,
   ORIGIN_SELECTED_DATA,
@@ -17,10 +21,6 @@ import {
 } from "./constants";
 
 const { RangePicker } = DatePicker;
-
-function hasErrors(fieldsError) {
-  return Object.keys(fieldsError).some(field => fieldsError[field]);
-}
 
 class BookingForm extends Component {
   constructor(props) {
@@ -70,11 +70,11 @@ class BookingForm extends Component {
     this.clearSelectedData(DESTINATION_SELECTED_DATA, apicode);
 
   handleSubmit = e => {
-    console.log("DOING SUBMIT");
+    const { search, form } = this.props;
     e.preventDefault();
-    this.props.form.validateFields((err, values) => {
+    form.validateFields((err, values) => {
       if (!err) {
-        console.log("Received values of form: ", values);
+        search(values);
       }
     });
   };
@@ -93,11 +93,16 @@ class BookingForm extends Component {
         [DESTINATION_SELECTED_DATA]: this.state[ORIGIN_SELECTED_DATA],
       });
     }, 300);
+    this.handleClearResults();
   };
+
+  handleClearResults = () => this.props.clear();
 
   render() {
     const {
-      form: { getFieldDecorator, getFieldValue, getFieldsValue },
+      isSearching,
+      bookings,
+      form: { getFieldDecorator, getFieldsValue },
     } = this.props;
     const { passengers, origin, destination, date } = getFieldsValue([
       "passengers",
@@ -112,118 +117,164 @@ class BookingForm extends Component {
       !origin ||
       origin.length === 0 ||
       !destination ||
-      destination.length === 0;
+      destination.length === 0 ||
+      isSearching;
+
     const shouldDisableSearchButton =
-      travelersAmount === 0 || !passengers || !date || shouldDisableSwapButton;
+      travelersAmount === 0 ||
+      !passengers ||
+      !date ||
+      shouldDisableSwapButton ||
+      isSearching;
 
     return (
-      <Form
-        layout="inline"
-        onSubmit={this.handleSubmit}
-        style={{
-          padding: "10px 7px 16px 25px",
-          backgroundColor: "aliceblue",
-        }}
-      >
-        <Row type="flex" justify="start">
-          <Form.Item>
-            {getFieldDecorator("flightType", {
-              rules: [
-                { required: true, message: "Please select a flight type!" },
-              ],
-              initialValue: ROUND_TRIP,
-            })(<DropdownSelect title="Flight type" options={FLIGHT_TYPES} />)}
-          </Form.Item>
-          <Form.Item>
-            {getFieldDecorator("passengers", {
-              rules: [
-                {
-                  required: true,
-                  message: "Please select a number of passengers!",
-                },
-              ],
-              initialValue: PASSENGERS_INITIAL_VALUE,
-            })(<PassengersSelector />)}
-          </Form.Item>
-          <Form.Item>
-            {getFieldDecorator("travelClass", {
-              rules: [
-                { required: true, message: "Please select a travel class!" },
-              ],
-              initialValue: ECONOMY,
-            })(<DropdownSelect title="Travel class" options={TRAVEL_CLASES} />)}
-          </Form.Item>
-        </Row>
-        <Row type="flex" justify="start" style={{}}>
-          <Form.Item>
-            {getFieldDecorator("origin", {
-              rules: [{ required: true, message: "Please select an origin!" }],
-              initialValue: [],
-            })(
-              <AirfieldSearcher
-                placeholder="From?"
-                selectedData={this.state[ORIGIN_SELECTED_DATA]}
-                setSelectedData={this.setOriginSelectedData}
-                clearSelectedData={this.clearOriginSelectedData}
-              />
-            )}
-          </Form.Item>
-          <Tooltip
-            title="Swap origin and destination"
-            mouseEnterDelay={TOOLTIP_DELAY}
-          >
-            <Button
-              disabled={shouldDisableSwapButton}
-              icon="swap"
-              onClick={this.handleSwapAirfields}
-              style={{ margin: "4px 16px 0 0" }}
-            />
-          </Tooltip>
-          <Form.Item>
-            {getFieldDecorator("destination", {
-              rules: [
-                { required: true, message: "Please select a destination!" },
-              ],
-              initialValue: [],
-            })(
-              <AirfieldSearcher
-                placeholder="Where?"
-                selectedData={this.state[DESTINATION_SELECTED_DATA]}
-                setSelectedData={this.setDestinationSelectedData}
-                clearSelectedData={this.clearDestinationSelectedData}
-              />
-            )}
-          </Form.Item>
-          <Form.Item>
-            {getFieldDecorator("date", {
-              rules: [
-                {
-                  required: true,
-                  message: "Please select departure and return date!",
-                },
-              ],
-            })(
-              <RangePicker
-                disabledDate={this.getDisabledTime}
-                format="ddd, MM/DD"
-                placeholder={["Departure Date", "Return Date"]}
-              />
-            )}
-          </Form.Item>
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              disabled={shouldDisableSearchButton}
-              icon="search"
+      <div>
+        <Form
+          layout="inline"
+          onSubmit={this.handleSubmit}
+          style={{
+            padding: "10px 7px 16px 25px",
+            background: "linear-gradient(135deg, #f1e2e2 0%, #c2ceec 100%)",
+            borderRadius: "3px",
+          }}
+        >
+          <Row type="flex" justify="start">
+            <Form.Item>
+              {getFieldDecorator("flightType", {
+                initialValue: ROUND_TRIP,
+              })(
+                <DropdownSelect
+                  title="Flight type"
+                  options={FLIGHT_TYPES}
+                  disabled={isSearching}
+                  handleClearResults={this.handleClearResults}
+                />
+              )}
+            </Form.Item>
+            <Form.Item>
+              {getFieldDecorator("passengers", {
+                initialValue: PASSENGERS_INITIAL_VALUE,
+              })(
+                <PassengersSelector
+                  disabled={isSearching}
+                  handleClearResults={this.handleClearResults}
+                />
+              )}
+            </Form.Item>
+            <Form.Item>
+              {getFieldDecorator("travelClass", {
+                initialValue: ECONOMY,
+              })(
+                <DropdownSelect
+                  title="Travel class"
+                  options={TRAVEL_CLASES}
+                  disabled={isSearching}
+                  handleClearResults={this.handleClearResults}
+                />
+              )}
+            </Form.Item>
+          </Row>
+          <Row type="flex" justify="start" style={{}}>
+            <Form.Item>
+              {getFieldDecorator("origin", {
+                initialValue: [],
+              })(
+                <AirfieldSearcher
+                  placeholder="From?"
+                  selectedData={this.state[ORIGIN_SELECTED_DATA]}
+                  setSelectedData={this.setOriginSelectedData}
+                  clearSelectedData={this.clearOriginSelectedData}
+                  disabled={isSearching}
+                  handleClearResults={this.handleClearResults}
+                />
+              )}
+            </Form.Item>
+            <Tooltip
+              title="Swap origin and destination"
+              mouseEnterDelay={TOOLTIP_DELAY}
             >
-              Search
-            </Button>
-          </Form.Item>
-        </Row>
-      </Form>
+              <Button
+                disabled={shouldDisableSwapButton}
+                icon="swap"
+                onClick={this.handleSwapAirfields}
+                style={{ margin: "4px 16px 0 0" }}
+              />
+            </Tooltip>
+            <Form.Item>
+              {getFieldDecorator("destination", {
+                initialValue: [],
+              })(
+                <AirfieldSearcher
+                  placeholder="Where?"
+                  selectedData={this.state[DESTINATION_SELECTED_DATA]}
+                  setSelectedData={this.setDestinationSelectedData}
+                  clearSelectedData={this.clearDestinationSelectedData}
+                  disabled={isSearching}
+                  handleClearResults={this.handleClearResults}
+                />
+              )}
+            </Form.Item>
+            <Form.Item>
+              {getFieldDecorator(
+                "date",
+                {}
+              )(
+                <RangePicker
+                  disabledDate={this.getDisabledTime}
+                  format="ddd, MM/DD"
+                  placeholder={["Departure Date", "Return Date"]}
+                  disabled={isSearching}
+                  onChange={this.handleClearResults}
+                />
+              )}
+            </Form.Item>
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                disabled={shouldDisableSearchButton}
+                loading={isSearching}
+                icon="search"
+              >
+                Search
+              </Button>
+            </Form.Item>
+          </Row>
+        </Form>
+        {bookings && bookings.length > 0 && (
+          <Row type="flex" justify="start">
+            <Results results={bookings} />
+          </Row>
+        )}
+      </div>
     );
   }
 }
 
-export default Form.create({})(BookingForm);
+const mapStateToProps = ({ bookings: { bookings, isSearching } }) => ({
+  bookings,
+  isSearching,
+});
+
+const mapDispatchToProps = dispatch => {
+  return {
+    search: payload => {
+      dispatch(search(payload));
+    },
+    clear: payload => {
+      dispatch(clear(payload));
+    },
+  };
+};
+
+PassengersSelector.propTypes = {
+  search: PropTypes.func,
+  form: PropTypes.object,
+  clear: PropTypes.func,
+  isSearching: PropTypes.bool,
+  bookings: PropTypes.array,
+};
+
+export default Form.create({})(
+  connect(mapStateToProps, mapDispatchToProps)(BookingForm)
+);

@@ -1,86 +1,56 @@
 import React, { Component } from "react";
-import { Select, Icon, Tooltip, Divider, Typography } from "antd";
-import airfields from "../../lib/api/airfields";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { Select, Tooltip, Divider, Typography, Spin } from "antd";
 import { MAX_AIRPORT_ALLOWED } from "./constants";
 import { mergeData } from "./utils";
+import { search, clear } from "./actions";
 import { TOOLTIP_DELAY } from "../../Containers/BookingForm/constants";
 
 const { Option } = Select;
 const { Text } = Typography;
 
-let timeout;
-let currentValue;
-
-function fetch(value, callback) {
-  if (timeout) {
-    clearTimeout(timeout);
-    timeout = null;
-  }
-  currentValue = value;
-
-  function fake() {
-    airfields.search(value).then(result => {
-      if (currentValue === value) {
-        const data = [];
-        result.data &&
-          result.data.length &&
-          result.data.forEach(
-            ({ ap, apicode, shortdisplayname, displayname }) => {
-              data.push({
-                ap,
-                apicode,
-                shortdisplayname,
-                displayname,
-              });
-            }
-          );
-        callback(data);
-      }
-    });
-  }
-
-  timeout = setTimeout(fake, 300);
-}
-
-export default class AirfieldSearcher extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      data: [],
-      noMatchingAirfield: false,
-    };
-  }
-
+class AirfieldSearcher extends Component {
   handleSearch = value => {
     if (value) {
-      fetch(value, data => this.setState({ data }));
+      this.props.search(value, data => this.setState({ data }));
     } else {
       this.setState({ data: [] });
     }
   };
 
   hanldeSelect = option => {
-    const { setSelectedData } = this.props;
-    const element = this.state.data.find(({ apicode }) => apicode === option);
-    this.setState({ data: [] }, setSelectedData(element));
+    const { setSelectedData, airfields, clear } = this.props;
+    const element = airfields.find(({ apicode }) => apicode === option);
+    setSelectedData(element);
+    clear();
   };
 
   hanldeDeselect = option => {
-    const { clearSelectedData } = this.props;
-    this.setState({ data: [] }, clearSelectedData(option));
+    const { clearSelectedData, clear } = this.props;
+    clearSelectedData(option);
+    clear();
   };
 
   handleChange = selectedOptions => {
-    this.props.onChange(selectedOptions);
+    const { onChange, handleClearResults } = this.props;
+    onChange(selectedOptions);
+    handleClearResults();
   };
 
   render() {
-    const { value, placeholder, selectedData } = this.props;
-    const { data, noMatchingAirfield } = this.state;
+    const {
+      value,
+      placeholder,
+      selectedData,
+      airfields,
+      isSearching,
+      disabled,
+    } = this.props;
 
     const valueLength = value.length;
 
-    const options = mergeData(selectedData, data).map(
+    const options = mergeData(selectedData, airfields).map(
       ({ ap, apicode, shortdisplayname, displayname }) => {
         return (
           <Option
@@ -101,7 +71,8 @@ export default class AirfieldSearcher extends React.Component {
     return (
       <Tooltip title="Search for an airfield" mouseEnterDelay={TOOLTIP_DELAY}>
         <Select
-          style={{ minWidth: "250px" }}
+          disabled={disabled}
+          style={{ minWidth: "200px" }}
           showSearch
           value={value}
           mode="multiple"
@@ -113,9 +84,7 @@ export default class AirfieldSearcher extends React.Component {
           onChange={this.handleChange}
           onSelect={this.hanldeSelect}
           onDeselect={this.hanldeDeselect}
-          notFoundContent={
-            noMatchingAirfield ? "Please enter a valid airfild name!" : null
-          }
+          notFoundContent={isSearching ? <Spin size="small" /> : null}
           optionLabelProp={valueLength > 1 ? "ap" : "shortdisplayname"}
           dropdownRender={menu => (
             <div>
@@ -137,3 +106,36 @@ export default class AirfieldSearcher extends React.Component {
     );
   }
 }
+
+const mapStateToProps = ({ airfields: { airfields, isSearching } }) => ({
+  airfields,
+  isSearching,
+});
+
+const mapDispatchToProps = dispatch => {
+  return {
+    search: payload => {
+      dispatch(search(payload));
+    },
+    clear: payload => {
+      dispatch(clear(payload));
+    },
+  };
+};
+
+AirfieldSearcher.propTypes = {
+  value: PropTypes.array.isRequired,
+  placeholder: PropTypes.string.isRequired,
+  selectedData: PropTypes.object.isRequired,
+  isSearching: PropTypes.bool.isRequired,
+  disabled: PropTypes.bool,
+  search: PropTypes.func.isRequired,
+  setSelectedData: PropTypes.func.isRequired,
+  airfields: PropTypes.array.isRequired,
+  clear: PropTypes.func.isRequired,
+  clearSelectedData: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
+  handleClearResults: PropTypes.func.isRequired,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(AirfieldSearcher);

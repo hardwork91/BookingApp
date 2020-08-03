@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 import { Icon, Menu, Dropdown, Tooltip } from "antd";
 import AmountSelector from "./AmountSelector";
 import { generatePassengerSelectorLabel } from "./utils";
@@ -19,12 +20,16 @@ export default class PassengersSelector extends Component {
   };
 
   handleAmountChange = (category, amount) => {
+    const { onChange, handleClearResults } = this.props;
     const passengers = { ...this.state.passengers, [category]: amount };
     this.setState(
       {
         passengers,
       },
-      this.props.onChange(passengers)
+      () => {
+        onChange(passengers);
+        handleClearResults();
+      }
     );
   };
 
@@ -50,6 +55,7 @@ export default class PassengersSelector extends Component {
     return (
       <Tooltip title="Passengers" mouseEnterDelay={TOOLTIP_DELAY}>
         <Dropdown
+          disabled={this.props.disabled}
           overlay={this.renderMenu()}
           trigger={["click"]}
           visible={this.state.visible}
@@ -64,3 +70,10 @@ export default class PassengersSelector extends Component {
     );
   }
 }
+
+PassengersSelector.propTypes = {
+  value: PropTypes.object.isRequired,
+  onChange: PropTypes.func.isRequired,
+  handleClearResults: PropTypes.func.isRequired,
+  disabled: PropTypes.bool,
+};

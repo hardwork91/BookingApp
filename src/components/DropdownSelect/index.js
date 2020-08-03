@@ -1,6 +1,6 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 import { Icon, Menu, Dropdown, Tooltip } from "antd";
-import { TRAVEL_CLASES } from "./constants";
 import { TOOLTIP_DELAY } from "../../Containers/BookingForm/constants";
 
 export default class DropdownSelect extends Component {
@@ -12,7 +12,11 @@ export default class DropdownSelect extends Component {
   }
 
   handleSelect = ({ key }) => {
-    this.setState({ value: key }, this.props.onChange(key));
+    const { onChange, handleClearResults } = this.props;
+    this.setState({ value: key }, () => {
+      onChange(key);
+      handleClearResults();
+    });
   };
 
   renderMenu = () => (
@@ -24,9 +28,14 @@ export default class DropdownSelect extends Component {
   );
 
   render() {
+    const { disabled, title } = this.props;
     return (
-      <Tooltip title={this.props.title} mouseEnterDelay={TOOLTIP_DELAY}>
-        <Dropdown overlay={this.renderMenu()} trigger={["click"]}>
+      <Tooltip title={title} mouseEnterDelay={TOOLTIP_DELAY}>
+        <Dropdown
+          overlay={this.renderMenu()}
+          trigger={["click"]}
+          disabled={disabled}
+        >
           <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
             {this.state.value} <Icon type="down" />
           </a>
@@ -35,3 +44,12 @@ export default class DropdownSelect extends Component {
     );
   }
 }
+
+DropdownSelect.propTypes = {
+  value: PropTypes.string,
+  options: PropTypes.array.isRequired,
+  disabled: PropTypes.bool,
+  title: PropTypes.string.isRequired,
+  onChange: PropTypes.func,
+  handleClearResults: PropTypes.func.isRequired,
+};
