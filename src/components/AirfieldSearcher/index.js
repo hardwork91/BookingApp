@@ -23,13 +23,11 @@ class AirfieldSearcher extends Component {
     const { setSelectedData, airfields, clear } = this.props;
     const element = airfields.find(({ apicode }) => apicode === option);
     setSelectedData(element);
-    clear();
   };
 
   hanldeDeselect = option => {
     const { clearSelectedData, clear } = this.props;
     clearSelectedData(option);
-    clear();
   };
 
   handleChange = selectedOptions => {
@@ -46,6 +44,7 @@ class AirfieldSearcher extends Component {
       airfields,
       isSearching,
       disabled,
+      clear,
     } = this.props;
 
     const valueLength = value.length;
@@ -71,6 +70,7 @@ class AirfieldSearcher extends Component {
     return (
       <Tooltip title="Search for an airfield" mouseEnterDelay={TOOLTIP_DELAY}>
         <Select
+          onBlur={clear}
           disabled={disabled}
           style={{ minWidth: "200px" }}
           showSearch
@@ -123,6 +123,7 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
+// prop types validation
 AirfieldSearcher.propTypes = {
   value: PropTypes.array.isRequired,
   placeholder: PropTypes.string.isRequired,

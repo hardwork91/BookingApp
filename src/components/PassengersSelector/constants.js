@@ -1,12 +1,12 @@
 // All categories are exported individually in case of being needed
 // Each gategory has Name(used as label and key) and Nescription
-export const CHILD = "Child";
+const CHILD = "Child";
 export const CHILD_DESCRIPTION = "- 11";
-export const YOUTH = "Youth";
+const YOUTH = "Youth";
 export const YOUTH_DESCRIPTION = "12 - 17";
-export const ADULTS = "Adults";
+const ADULTS = "Adults";
 export const ADULTS_DESCRIPTION = "18 - 64";
-export const SENIORS = "Seniors";
+const SENIORS = "Seniors";
 export const SENIORS_DESCRIPTION = "65 +";
 
 // Add a new category is easy, just need to add it on the PASSENGERS_CATEGORIES array

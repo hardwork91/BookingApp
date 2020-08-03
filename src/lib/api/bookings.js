@@ -1,7 +1,9 @@
 const bookings = {
   search() {
-    // This should make an axios call to the booking search service. Instead we will return a mocked value.
-    // Will also use setTimeout to simulate network delay
+    /* This should make an axios call to the booking search service.
+     * A mocked value is returned instead.
+     * Will also use setTimeout to simulate a 2 seconds network delay.
+     */
     return new Promise(function(resolve) {
       setTimeout(resolve, 2000, {
         data: [
