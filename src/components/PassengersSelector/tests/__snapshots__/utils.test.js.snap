@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`when generatePassengerSelectorLabel 1`] = `"1 Adults"`;
+
+exports[`when generatePassengerSelectorLabel and have more than one category selected 1`] = `"4 Travelers"`;

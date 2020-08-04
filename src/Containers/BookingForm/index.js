@@ -170,9 +170,10 @@ class BookingForm extends Component {
       !date ||
       shouldDisableSwapButton ||
       isSearching;
+
     return (
-      <Row type="flex" justify="start" style={{}}>
-        <Form.Item>
+      <Row>
+        <Form.Item style={{ marginRight: 5 }}>
           {getFieldDecorator("origin", {
             initialValue: [],
           })(
@@ -183,6 +184,7 @@ class BookingForm extends Component {
               clearSelectedData={this.clearOriginSelectedData}
               disabled={isSearching}
               handleClearResults={this.handleClearResults}
+              isOrigin
             />
           )}
         </Form.Item>
@@ -194,10 +196,10 @@ class BookingForm extends Component {
             disabled={shouldDisableSwapButton}
             icon="swap"
             onClick={this.handleSwapAirfields}
-            style={{ margin: "4px 16px 0 0" }}
+            style={{ margin: "4px 5px 0 0" }}
           />
         </Tooltip>
-        <Form.Item>
+        <Form.Item style={{ marginRight: 5 }}>
           {getFieldDecorator("destination", {
             initialValue: [],
           })(
@@ -211,7 +213,7 @@ class BookingForm extends Component {
             />
           )}
         </Form.Item>
-        <Form.Item>
+        <Form.Item style={{ marginRight: 5 }}>
           {getFieldDecorator(
             "date",
             {}
@@ -225,23 +227,21 @@ class BookingForm extends Component {
             />
           )}
         </Form.Item>
-        <Form.Item>
+        <Form.Item style={{ marginRight: 0 }}>
           <Button
             type="primary"
             htmlType="submit"
             disabled={shouldDisableSearchButton}
             loading={isSearching}
             icon="search"
-          >
-            Search
-          </Button>
+          />
         </Form.Item>
       </Row>
     );
   };
 
   render() {
-    const { bookings } = this.props;
+    const { bookings, isSearching } = this.props;
 
     return (
       <div>
@@ -249,20 +249,17 @@ class BookingForm extends Component {
           layout="inline"
           onSubmit={this.handleSubmit}
           style={{
-            padding: "10px 7px 16px 25px",
-            background: "linear-gradient(135deg, #f1e2e2 0%, #c2ceec 100%)",
-            borderRadius: "3px",
+            padding: "5px 20px 14px 20px",
+            borderRadius: 5,
             boxShadow: "0px 3px 10px 0px rgba(0, 0, 0, 0.1)",
           }}
         >
           {this.renderFlightSelectionPanel()}
           {this.renderOriginDestinationPanel()}
         </Form>
-        {bookings && bookings.length > 0 && (
-          <Row type="flex" justify="start">
-            <Results results={bookings} />
-          </Row>
-        )}
+        <Row type="flex" justify="start">
+          <Results results={bookings} isLoading={isSearching} />
+        </Row>
       </div>
     );
   }

@@ -9,12 +9,16 @@ class App extends Component {
   render() {
     return (
       <Router basename={process.env.PUBLIC_URL}>
-        <Row type="flex" justify="center" style={{ marginTop: "100px" }}>
-          <Title style={{ color: "#5d6ba0" }}>
-            Search hundereds of travel sites at once.
-          </Title>
-          <BookingForm />
-        </Row>
+        <div>
+          <Row type="flex" justify="center" style={{ marginTop: 100 }}>
+            <Title style={{ color: "#0c8bd0", fontWeight: "lighter" }}>
+              Search hundreds of flight sites at once.
+            </Title>
+          </Row>
+          <Row type="flex" justify="center">
+            <BookingForm />
+          </Row>
+        </div>
       </Router>
     );
   }

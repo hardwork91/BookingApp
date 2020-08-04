@@ -1,0 +1,185 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`render as expected when is loading 1`] = `
+<div
+  style={
+    Object {
+      "backgroundColor": "white",
+      "borderRadius": 5,
+      "boxShadow": "0px 3px 10px 0px rgba(0, 0, 0, 0.1)",
+      "marginTop": 10,
+      "padding": 20,
+      "width": "100%",
+    }
+  }
+>
+  <div
+    className="ant-skeleton ant-skeleton-active"
+  >
+    <div
+      className="ant-skeleton-content"
+    >
+      <h3
+        className="ant-skeleton-title"
+        style={
+          Object {
+            "width": "38%",
+          }
+        }
+      />
+      <ul
+        className="ant-skeleton-paragraph"
+        style={undefined}
+      >
+        <li
+          style={
+            Object {
+              "width": undefined,
+            }
+          }
+        />
+        <li
+          style={
+            Object {
+              "width": undefined,
+            }
+          }
+        />
+        <li
+          style={
+            Object {
+              "width": "61%",
+            }
+          }
+        />
+      </ul>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`render as expected when status is online 1`] = `
+<div
+  style={
+    Object {
+      "backgroundColor": "white",
+      "borderRadius": 5,
+      "boxShadow": "0px 3px 10px 0px rgba(0, 0, 0, 0.1)",
+      "marginTop": 10,
+      "padding": 20,
+      "width": "100%",
+    }
+  }
+>
+  <h3
+    aria-label={null}
+    className="ant-typography"
+    style={
+      Object {
+        "WebkitLineClamp": null,
+        "color": "#0c8bd0",
+        "fontWeight": "lighter",
+      }
+    }
+  >
+    Results goes here
+  </h3>
+  <span
+    aria-label={null}
+    className="ant-typography"
+    style={
+      Object {
+        "WebkitLineClamp": null,
+      }
+    }
+  >
+    The results should be provided by a real API
+    <i
+      aria-label="icon: api"
+      className="anticon anticon-api"
+      onClick={undefined}
+      tabIndex={undefined}
+    >
+      <svg
+        aria-hidden="true"
+        className=""
+        data-icon="api"
+        fill="currentColor"
+        focusable="false"
+        height="1em"
+        onClick={undefined}
+        style={undefined}
+        viewBox="64 64 896 896"
+        width="1em"
+      >
+        <path
+          d="M917.7 148.8l-42.4-42.4c-1.6-1.6-3.6-2.3-5.7-2.3s-4.1.8-5.7 2.3l-76.1 76.1a199.27 199.27 0 0 0-112.1-34.3c-51.2 0-102.4 19.5-141.5 58.6L432.3 308.7a8.03 8.03 0 0 0 0 11.3L704 591.7c1.6 1.6 3.6 2.3 5.7 2.3 2 0 4.1-.8 5.7-2.3l101.9-101.9c68.9-69 77-175.7 24.3-253.5l76.1-76.1c3.1-3.2 3.1-8.3 0-11.4zM769.1 441.7l-59.4 59.4-186.8-186.8 59.4-59.4c24.9-24.9 58.1-38.7 93.4-38.7 35.3 0 68.4 13.7 93.4 38.7 24.9 24.9 38.7 58.1 38.7 93.4 0 35.3-13.8 68.4-38.7 93.4zm-190.2 105a8.03 8.03 0 0 0-11.3 0L501 613.3 410.7 523l66.7-66.7c3.1-3.1 3.1-8.2 0-11.3L441 408.6a8.03 8.03 0 0 0-11.3 0L363 475.3l-43-43a7.85 7.85 0 0 0-5.7-2.3c-2 0-4.1.8-5.7 2.3L206.8 534.2c-68.9 69-77 175.7-24.3 253.5l-76.1 76.1a8.03 8.03 0 0 0 0 11.3l42.4 42.4c1.6 1.6 3.6 2.3 5.7 2.3s4.1-.8 5.7-2.3l76.1-76.1c33.7 22.9 72.9 34.3 112.1 34.3 51.2 0 102.4-19.5 141.5-58.6l101.9-101.9c3.1-3.1 3.1-8.2 0-11.3l-43-43 66.7-66.7c3.1-3.1 3.1-8.2 0-11.3l-36.6-36.2zM441.7 769.1a131.32 131.32 0 0 1-93.4 38.7c-35.3 0-68.4-13.7-93.4-38.7a131.32 131.32 0 0 1-38.7-93.4c0-35.3 13.7-68.4 38.7-93.4l59.4-59.4 186.8 186.8-59.4 59.4z"
+        />
+      </svg>
+    </i>
+  </span>
+  <div
+    className="ant-collapse ant-collapse-borderless ant-collapse-icon-position-left"
+    role={null}
+    style={
+      Object {
+        "backgroundColor": " #f0f8ff00",
+      }
+    }
+  >
+    <div
+      className="ant-collapse-item"
+      id={undefined}
+      style={
+        Object {
+          "border": "none",
+        }
+      }
+    >
+      <div
+        aria-expanded="false"
+        className="ant-collapse-header"
+        onClick={[Function]}
+        onKeyPress={[Function]}
+        role="button"
+        tabIndex={0}
+      >
+        <i
+          aria-label="icon: right"
+          className="anticon anticon-right ant-collapse-arrow"
+          onClick={undefined}
+          tabIndex={undefined}
+        >
+          <svg
+            aria-hidden="true"
+            className=""
+            data-icon="right"
+            fill="currentColor"
+            focusable="false"
+            height="1em"
+            onClick={undefined}
+            style={undefined}
+            viewBox="64 64 896 896"
+            width="1em"
+          >
+            <path
+              d="M765.7 486.8L314.9 134.7A7.97 7.97 0 0 0 302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 0 0 0-50.4z"
+            />
+          </svg>
+        </i>
+        <span
+          aria-label={null}
+          className="ant-typography"
+          style={
+            Object {
+              "WebkitLineClamp": null,
+            }
+          }
+        >
+          Instead, you can see here the fake data returned by the mocked API
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+`;

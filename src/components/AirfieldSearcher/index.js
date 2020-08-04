@@ -10,23 +10,21 @@ import { TOOLTIP_DELAY } from "../../Containers/BookingForm/constants";
 const { Option } = Select;
 const { Text } = Typography;
 
-class AirfieldSearcher extends Component {
+export class AirfieldSearcher extends Component {
   handleSearch = value => {
     if (value) {
-      this.props.search(value, data => this.setState({ data }));
-    } else {
-      this.setState({ data: [] });
+      this.props.search(value);
     }
   };
 
   hanldeSelect = option => {
-    const { setSelectedData, airfields, clear } = this.props;
+    const { setSelectedData, airfields } = this.props;
     const element = airfields.find(({ apicode }) => apicode === option);
     setSelectedData(element);
   };
 
   hanldeDeselect = option => {
-    const { clearSelectedData, clear } = this.props;
+    const { clearSelectedData } = this.props;
     clearSelectedData(option);
   };
 
@@ -69,50 +67,54 @@ class AirfieldSearcher extends Component {
 
     return (
       <Tooltip title="Search for an airfield" mouseEnterDelay={TOOLTIP_DELAY}>
-        <Select
-          onBlur={clear}
-          disabled={disabled}
-          style={{ minWidth: "200px" }}
-          showSearch
-          value={value}
-          mode="multiple"
-          placeholder={placeholder}
-          defaultActiveFirstOption={false}
-          showArrow={false}
-          filterOption={false}
-          onSearch={this.handleSearch}
-          onChange={this.handleChange}
-          onSelect={this.hanldeSelect}
-          onDeselect={this.hanldeDeselect}
-          notFoundContent={isSearching ? <Spin size="small" /> : null}
-          optionLabelProp={valueLength > 1 ? "ap" : "shortdisplayname"}
-          dropdownRender={menu => (
-            <div>
-              {menu}
-              {valueLength === MAX_AIRPORT_ALLOWED && (
-                <div style={{ marginBottom: "5px" }}>
-                  <Divider style={{ margin: "5px 0" }} />
-                  <Text strong style={{ marginLeft: "10px" }}>
-                    {`Maximun ${MAX_AIRPORT_ALLOWED} airports`}
-                  </Text>
-                </div>
-              )}
-            </div>
-          )}
-        >
-          {options}
-        </Select>
+        <div className="select-container" style={{ width: "100%" }}>
+          <Select
+            onBlur={clear}
+            disabled={disabled}
+            style={{ minWidth: 250 }}
+            showSearch
+            value={value}
+            mode="multiple"
+            placeholder={placeholder}
+            defaultActiveFirstOption={false}
+            showArrow={false}
+            filterOption={false}
+            onSearch={this.handleSearch}
+            onChange={this.handleChange}
+            onSelect={this.hanldeSelect}
+            onDeselect={this.hanldeDeselect}
+            notFoundContent={isSearching ? <Spin size="small" /> : null}
+            optionLabelProp={valueLength > 1 ? "ap" : "shortdisplayname"}
+            dropdownRender={menu => (
+              <div>
+                {menu}
+                {valueLength === MAX_AIRPORT_ALLOWED && (
+                  <div style={{ marginBottom: 5 }}>
+                    <Divider style={{ margin: "5px 0" }} />
+                    <Text strong style={{ marginLeft: 10 }}>
+                      {`Maximun ${MAX_AIRPORT_ALLOWED} airports`}
+                    </Text>
+                  </div>
+                )}
+              </div>
+            )}
+          >
+            {options}
+          </Select>
+        </div>
       </Tooltip>
     );
   }
 }
 
-const mapStateToProps = ({ airfields: { airfields, isSearching } }) => ({
+// exporting just for testing
+export const mapStateToProps = ({ airfields: { airfields, isSearching } }) => ({
   airfields,
   isSearching,
 });
 
-const mapDispatchToProps = dispatch => {
+// exporting just for testing
+export const mapDispatchToProps = dispatch => {
   return {
     search: payload => {
       dispatch(search(payload));

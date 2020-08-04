@@ -19,6 +19,8 @@ export default class DropdownSelect extends Component {
     });
   };
 
+  handleOnClick = e => e.preventDefault();
+
   renderMenu = () => (
     <Menu selectedKeys={this.state.value} onClick={this.handleSelect}>
       {this.props.options.map(option => (
@@ -36,7 +38,7 @@ export default class DropdownSelect extends Component {
           trigger={["click"]}
           disabled={disabled}
         >
-          <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+          <a className="ant-dropdown-link" onClick={this.handleOnClick}>
             {this.state.value} <Icon type="down" />
           </a>
         </Dropdown>

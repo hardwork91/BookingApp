@@ -48,7 +48,6 @@ export const generatePassengerSelectorLabel = passengers => {
       </Popover>
     );
   }
-
   return {
     label,
     amount: totalAmount,

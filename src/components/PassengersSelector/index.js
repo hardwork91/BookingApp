@@ -33,6 +33,8 @@ export default class PassengersSelector extends Component {
     );
   };
 
+  handleOnClick = e => e.preventDefault();
+
   renderMenu = () => (
     <Menu>
       {PASSENGERS_CATEGORIES.map(category => {
@@ -61,7 +63,7 @@ export default class PassengersSelector extends Component {
           visible={this.state.visible}
           onVisibleChange={this.handleVisibleChange}
         >
-          <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+          <a className="ant-dropdown-link" onClick={this.handleOnClick}>
             {label}
             <Icon type="down" />
           </a>

@@ -1,6 +1,6 @@
 // All categories are exported individually in case of being needed
 // Each gategory has Name(used as label and key) and Nescription
-const CHILD = "Child";
+export const CHILD = "Child";
 export const CHILD_DESCRIPTION = "- 11";
 const YOUTH = "Youth";
 export const YOUTH_DESCRIPTION = "12 - 17";

@@ -1,4 +1,5 @@
 import { call, put, takeEvery } from "redux-saga/effects";
+import { message } from "antd";
 import airfields from "../../lib/api/airfields";
 import {
   SEARCH_AIRFIELD_REQUEST,
@@ -23,6 +24,7 @@ export function* searchSaga({ payload }) {
     }
   } catch (error) {
     // in case of error, an failure SEARCH_AIRFIELD_FAILURE type action is dispatched. So it can be handled by an error reducer (not implemented on this example)
+    message.error("Sorry, looks like there are some network troubles");
     yield put({ type: SEARCH_AIRFIELD_FAILURE });
   }
 }
