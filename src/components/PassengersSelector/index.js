@@ -15,10 +15,13 @@ export default class PassengersSelector extends Component {
     };
   }
 
+  // the visibility must be controlled manually to avoid getting the menu closed when the input number is clicked
   handleVisibleChange = flag => {
+    // the visibility is stored in the component state
     this.setState({ visible: flag });
   };
 
+  // when the amout of any category changes, it must be updated in the state and also update form item value.
   handleAmountChange = (category, amount) => {
     const { onChange, handleClearResults } = this.props;
     const passengers = { ...this.state.passengers, [category]: amount };
@@ -27,14 +30,18 @@ export default class PassengersSelector extends Component {
         passengers,
       },
       () => {
+        // update the form field value
         onChange(passengers);
+        // on value change, the booking results must be cleared
         handleClearResults();
       }
     );
   };
 
+  // prevent default <a/> tag behavior
   handleOnClick = e => e.preventDefault();
 
+  // render the menu using the PASSENGERS_CATEGORIES preset list of categories
   renderMenu = () => (
     <Menu>
       {PASSENGERS_CATEGORIES.map(category => {
@@ -52,9 +59,11 @@ export default class PassengersSelector extends Component {
   );
 
   render() {
+    // The control label is generated depending on how many passengers and categories the user selects
     const { label } = generatePassengerSelectorLabel(this.state.passengers);
 
     return (
+      // use a tooltip for helping users to understand what means this control
       <Tooltip title="Passengers" mouseEnterDelay={TOOLTIP_DELAY}>
         <Dropdown
           disabled={this.props.disabled}
@@ -73,9 +82,10 @@ export default class PassengersSelector extends Component {
   }
 }
 
+// prop types validation
 PassengersSelector.propTypes = {
-  value: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
+  value: PropTypes.object,
+  onChange: PropTypes.func,
   handleClearResults: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
 };

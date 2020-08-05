@@ -610,11 +610,6 @@ exports[`AirfieldSearcher render as expected when conected component 1`] = `
               key="trigger"
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
-              style={
-                Object {
-                  "width": "100%",
-                }
-              }
             >
               <Select
                 choiceTransitionName="zoom"
@@ -1543,11 +1538,6 @@ exports[`AirfieldSearcher render as expected when has selected the max number of
           key="trigger"
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
-          style={
-            Object {
-              "width": "100%",
-            }
-          }
         >
           <Select
             choiceTransitionName="zoom"
@@ -2730,11 +2720,6 @@ exports[`AirfieldSearcher render as expected when is searching 1`] = `
           key="trigger"
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
-          style={
-            Object {
-              "width": "100%",
-            }
-          }
         >
           <Select
             choiceTransitionName="zoom"

@@ -6,6 +6,7 @@ import * as constants from "./constants";
 const { Text } = Typography;
 
 export default class AmountSelector extends Component {
+  // update the passenger selector state when change the spinner value
   handleChange = value => {
     const { category, onChange } = this.props;
     onChange(category, value);
@@ -22,6 +23,7 @@ export default class AmountSelector extends Component {
         <InputNumber
           style={{ float: "right", marginLeft: "1em" }}
           size="small"
+          // imput number min value is setted to 0
           min={0}
           defaultValue={amount}
           onChange={this.handleChange}
@@ -32,6 +34,7 @@ export default class AmountSelector extends Component {
   }
 }
 
+// prop types validation
 AmountSelector.propTypes = {
   category: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,

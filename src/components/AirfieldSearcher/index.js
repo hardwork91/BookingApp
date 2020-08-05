@@ -11,26 +11,33 @@ const { Option } = Select;
 const { Text } = Typography;
 
 export class AirfieldSearcher extends Component {
+  // dispatch the search action to find all matching airports
   handleSearch = value => {
     if (value) {
       this.props.search(value);
     }
   };
 
+  // when select an airport option save it on the booking form state
   hanldeSelect = option => {
     const { setSelectedData, airfields } = this.props;
+    // find the whole information in the airfield array
     const element = airfields.find(({ apicode }) => apicode === option);
+    // and save it on the booking form state
     setSelectedData(element);
   };
 
+  // remove the deselected option from the booking form state
   hanldeDeselect = option => {
     const { clearSelectedData } = this.props;
     clearSelectedData(option);
   };
 
+  // On each select change update the form item value via onChange prop
   handleChange = selectedOptions => {
     const { onChange, handleClearResults } = this.props;
     onChange(selectedOptions);
+    // as the airfields changed, remove also the results of booking search
     handleClearResults();
   };
 
@@ -47,6 +54,7 @@ export class AirfieldSearcher extends Component {
 
     const valueLength = value.length;
 
+    // List of airports are obtained by merging the selected airports with the result of calling the search airport service
     const options = mergeData(selectedData, airfields).map(
       ({ ap, apicode, shortdisplayname, displayname }) => {
         return (
@@ -55,6 +63,7 @@ export class AirfieldSearcher extends Component {
             value={apicode}
             shortdisplayname={shortdisplayname}
             ap={ap}
+            // Keep the selected airfields up to MAX_AIRPORT_ALLOWED (3)
             disabled={
               valueLength === MAX_AIRPORT_ALLOWED && !value.includes(apicode)
             }
@@ -66,8 +75,9 @@ export class AirfieldSearcher extends Component {
     );
 
     return (
+      // use a tooltip for helping users to understand what to do whit this control
       <Tooltip title="Search for an airfield" mouseEnterDelay={TOOLTIP_DELAY}>
-        <div className="select-container" style={{ width: "100%" }}>
+        <div className="select-container">
           <Select
             onBlur={clear}
             disabled={disabled}
@@ -83,8 +93,11 @@ export class AirfieldSearcher extends Component {
             onChange={this.handleChange}
             onSelect={this.hanldeSelect}
             onDeselect={this.hanldeDeselect}
+            // show spin indicator while searching
             notFoundContent={isSearching ? <Spin size="small" /> : null}
+            // if has more than 1 airfield selected, use the 'ap' code to get the name short and fit the 3 airports in the same space
             optionLabelProp={valueLength > 1 ? "ap" : "shortdisplayname"}
+            // modify the default select component render to show a message when u get 3 airpots selected
             dropdownRender={menu => (
               <div>
                 {menu}

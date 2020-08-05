@@ -22,16 +22,17 @@ import {
 
 const { RangePicker } = DatePicker;
 
-class BookingForm extends Component {
+export class BookingForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      // those variables are used for store the selected options in each airport select, origin and destination
       [ORIGIN_SELECTED_DATA]: {},
       [DESTINATION_SELECTED_DATA]: {},
     };
   }
 
-  // Can only select days after today (included) and same day as today but next year (excluded)
+  // User can only select a range of days between today (included) and same day of next year (excluded)
   getDisabledTime = current => {
     return (
       current &&
@@ -43,18 +44,22 @@ class BookingForm extends Component {
     );
   };
 
+  // update the selected element in the state in the correct airport input
   setSelectedData = (field, { apicode, ...data }) => {
     this.setState({
       [field]: { ...this.state[field], [apicode]: data },
     });
   };
 
+  // update the selected element in the state in origin airport input
   setOriginSelectedData = data =>
     this.setSelectedData(ORIGIN_SELECTED_DATA, data);
 
+  // update the selected element in the state in destination airport input
   setDestinationSelectedData = data =>
     this.setSelectedData(DESTINATION_SELECTED_DATA, data);
 
+  // same as set function but removing the deselected airport
   clearSelectedData = (field, apicode) => {
     const newState = this.state[field];
     delete newState[apicode];
@@ -63,12 +68,15 @@ class BookingForm extends Component {
     });
   };
 
+  // same as set function but removing the deselected airport in origin airport input
   clearOriginSelectedData = apicode =>
     this.clearSelectedData(ORIGIN_SELECTED_DATA, apicode);
 
+  // same as set function but removing the deselected airport in destination airport input
   clearDestinationSelectedData = apicode =>
     this.clearSelectedData(DESTINATION_SELECTED_DATA, apicode);
 
+  // handle the submission request and dispatch the search booking request action
   handleSubmit = e => {
     const { search, form } = this.props;
     e.preventDefault();
@@ -79,6 +87,7 @@ class BookingForm extends Component {
     });
   };
 
+  // swap the orign and destination selected airports
   handleSwapAirfields = () => {
     const {
       form: { getFieldValue, resetFields, setFieldsValue },
@@ -86,18 +95,23 @@ class BookingForm extends Component {
     const origin = getFieldValue("origin");
     const destination = getFieldValue("destination");
     resetFields(["origin", "destination"]);
+    // a delay is used to help to finish the fade in/out animation
     setTimeout(() => {
       setFieldsValue({ origin: destination, destination: origin });
+      // swap the state value too
       this.setState({
         [ORIGIN_SELECTED_DATA]: this.state[DESTINATION_SELECTED_DATA],
         [DESTINATION_SELECTED_DATA]: this.state[ORIGIN_SELECTED_DATA],
       });
     }, 300);
+    // as the origin and destination values changed, the search booking results must be cleared
     this.handleClearResults();
   };
 
+  // dispatch the clear result request action
   handleClearResults = () => this.props.clear();
 
+  // render the upper panel
   renderFlightSelectionPanel = () => {
     const {
       isSearching,
@@ -143,6 +157,7 @@ class BookingForm extends Component {
     );
   };
 
+  // render the lower panel
   renderOriginDestinationPanel = () => {
     const {
       isSearching,
@@ -155,21 +170,25 @@ class BookingForm extends Component {
       "date",
     ]);
 
+    // obtain how many passenger has been selected
     const travelersAmount = generatePassengerSelectorLabel(passengers).amount;
 
+    // should disable the swaping button if is searching airfields or both origin and destination fields are empty
     const shouldDisableSwapButton =
+      isSearching ||
+      ((!origin || origin.length === 0) &&
+        (!destination || destination.length === 0));
+
+    // should disable search booking button if is searching, has 0 travelers selected, does has a selected date range
+    // or does not have an origin and destination selected
+    const shouldDisableSearchButton =
+      isSearching ||
+      travelersAmount === 0 ||
+      !date ||
       !origin ||
       origin.length === 0 ||
       !destination ||
-      destination.length === 0 ||
-      isSearching;
-
-    const shouldDisableSearchButton =
-      travelersAmount === 0 ||
-      !passengers ||
-      !date ||
-      shouldDisableSwapButton ||
-      isSearching;
+      destination.length === 0;
 
     return (
       <Row>
@@ -265,12 +284,14 @@ class BookingForm extends Component {
   }
 }
 
-const mapStateToProps = ({ bookings: { bookings, isSearching } }) => ({
+// exported just for testing
+export const mapStateToProps = ({ bookings: { bookings, isSearching } }) => ({
   bookings,
   isSearching,
 });
 
-const mapDispatchToProps = dispatch => {
+// exported just for testing
+export const mapDispatchToProps = dispatch => {
   return {
     search: payload => {
       dispatch(search(payload));
@@ -281,7 +302,8 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-PassengersSelector.propTypes = {
+// prop types validation
+BookingForm.propTypes = {
   search: PropTypes.func,
   form: PropTypes.object,
   clear: PropTypes.func,

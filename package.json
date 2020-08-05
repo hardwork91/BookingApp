@@ -1,6 +1,7 @@
 {
   "name": "booking",
   "version": "0.1.0",
+  "private": true,
   "dependencies": {
     "@babel/preset-env": "7.7.7",
     "@babel/preset-react": "7.7.4",
@@ -22,6 +23,13 @@
     "react-test-renderer": "16.4.1",
     "redux": "3.7.2",
     "redux-saga": "0.16"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx}",
+      "!src/*.js",
+      "!src/Containers/BookingForm/index.js"
+    ]
   },
   "scripts": {
     "start": "react-scripts start",

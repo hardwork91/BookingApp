@@ -11,16 +11,21 @@ export default class DropdownSelect extends Component {
     };
   }
 
+  // set the selected key (which match with label) on the state to display it as label of the dropdown
   handleSelect = ({ key }) => {
     const { onChange, handleClearResults } = this.props;
     this.setState({ value: key }, () => {
+      // also update the form field value
       onChange(key);
+      // on option value change, the booking results must be cleared
       handleClearResults();
     });
   };
 
+  // prevent default <a/> tag behavior
   handleOnClick = e => e.preventDefault();
 
+  // render the menu with the suplied prop options. In this case options are an array of key-labels
   renderMenu = () => (
     <Menu selectedKeys={this.state.value} onClick={this.handleSelect}>
       {this.props.options.map(option => (
@@ -32,6 +37,7 @@ export default class DropdownSelect extends Component {
   render() {
     const { disabled, title } = this.props;
     return (
+      // use a tooltip for helping users to understand what means this control
       <Tooltip title={title} mouseEnterDelay={TOOLTIP_DELAY}>
         <Dropdown
           overlay={this.renderMenu()}
@@ -47,6 +53,7 @@ export default class DropdownSelect extends Component {
   }
 }
 
+// prop types validation
 DropdownSelect.propTypes = {
   value: PropTypes.string,
   options: PropTypes.array.isRequired,

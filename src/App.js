@@ -11,7 +11,13 @@ class App extends Component {
       <Router basename={process.env.PUBLIC_URL}>
         <div>
           <Row type="flex" justify="center" style={{ marginTop: 100 }}>
-            <Title style={{ color: "#0c8bd0", fontWeight: "lighter" }}>
+            <Title
+              style={{
+                color: "#0c8bd0",
+                fontWeight: "lighter",
+                textAlign: "center",
+              }}
+            >
               Search hundreds of flight sites at once.
             </Title>
           </Row>

@@ -10,6 +10,7 @@ const { Panel } = Collapse;
 
 const Result = props => {
   const { results, isLoading } = props;
+
   const containerStyle = {
     backgroundColor: "white",
     width: "100%",
@@ -21,6 +22,7 @@ const Result = props => {
 
   return (
     <Fragment>
+      {/* render the results of the booking search when is not loading */}
       {!isLoading && results && results.length > 0 && (
         <div style={containerStyle}>
           <Title level={3} style={{ color: "#0c8bd0", fontWeight: "lighter" }}>
@@ -50,6 +52,7 @@ const Result = props => {
           </Collapse>
         </div>
       )}
+       {/* render an skeleton while loading */}
       {isLoading && (
         <div style={containerStyle}>
           <Skeleton active />
